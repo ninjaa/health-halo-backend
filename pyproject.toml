@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "anthropic-function-calling"
+version = "0.1.0"
+description = ""
+authors = ["Aditya Advani <aditya@bestparents.com>"]
+readme = "README.md"
+packages = [{include = "anthropic_function_calling"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+psycopg2 = "^2.9.6"
+python-dotenv = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
