@@ -208,7 +208,7 @@ def search_notes(search_str: "str") -> "table":
     table: A table of medical record notes.
     """
 
-    return run_sql(f"SELECT * FROM notes_data WHERE note_type ILIKE '%{search_str}%' OR note_content ILIKE '%{search_str}%'")
+    return run_sql(f"SELECT * FROM notes_data WHERE note_type ILIKE '%{search_str}%' OR note_content ILIKE '%{search_str}%' LIMIT 5")
 
 
 @doc_extractor
@@ -303,7 +303,7 @@ def search_labs(search_str: "str") -> "table":
     Returns:
     table: A table of medical record lab results.
     """
-    return run_sql(f"SELECT * FROM lab_data WHERE lab ILIKE '%{search_str}%' OR source ILIKE '%{search_str}%'")
+    return run_sql(f"SELECT * FROM lab_data WHERE lab ILIKE '%{search_str}%' OR source ILIKE '%{search_str}%' LIMIT 10")
 
 
 XML_FUNCTION_DEFINITIONS = dict_to_pretty_xml(functions)
