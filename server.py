@@ -485,8 +485,10 @@ def function_action(function_name):
         return "Fetching medication data filtered by medication type..."
     elif function_name == "get_count_meds":
         return "Fetching the total count of medication records..."
+    elif function_name == "notify_team_by_sms":
+        return "Sending a message to the team via SMS..."
     else:
-        return "Unknown function action..."
+        return "Executing..."
 app = Flask(__name__)
 @app.route('/notes/<int:note_id>', methods=['GET'])
 def get_note(note_id):
