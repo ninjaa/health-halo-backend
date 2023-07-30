@@ -5,7 +5,7 @@
 curl 'http://localhost:8000/conduct_chat' \
     -H 'Content-Type: application/json' \
     --data-raw '{
-    "initial_messages": [{"role": "user", "content": "A new value has just been reported for Calcium at 12. Review the patient record and SMS the care team with the clinical significance of the new record" }]
+    "initial_messages": [{"role": "user", "lab_result": "A new value has just been reported for Calcium at 12. Review the patient record and SMS the care team with the clinical significance of the new record" }]
 }' \
     --compressed
 

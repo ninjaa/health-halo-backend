@@ -532,8 +532,11 @@ def get_note(note_id):
 def conduct_chat_endpoint():
     initial_messages = request.json.get('initial_messages')
     last_message = initial_messages[-1]
-    question = last_message['content'] + \
+    if "content" in last_message:
+        question = last_message['content'] + \
         " - remember to include the sources to notes if you reference any information from them!"
+    elif "lab_result" in last_message:
+        question = last_message['lab_result'] + " - remember this is new information not yet in the database! So please consider it very fresh and accurate."
 
     def conduct_chat():
         current_prompt = get_initial_prompt(question)
