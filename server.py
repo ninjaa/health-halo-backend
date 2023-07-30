@@ -309,7 +309,7 @@ def search_labs(search_str: "str") -> "table":
 @doc_extractor
 def get_meds(start_index: "int", end_index: "int") -> "table":
     """
-    Fetches med data for the current patient from `start_index` to `end_index`.
+    Fetches medications listings for the current patient from `start_index` to `end_index`.
 
     Arguments:
     start_index (int): The starting index for the med data retrieval.
@@ -331,7 +331,7 @@ def get_meds(start_index: "int", end_index: "int") -> "table":
 @doc_extractor
 def get_meds_by_type(type: "str") -> "table":
     """
-    Fetches med data for the current patient filtered by the med type provided.
+    Fetches medications data for the current patient filtered by the medication type provided.
 
     Arguments:
     type (str): The type of med to be retrieved.
@@ -352,7 +352,7 @@ def get_meds_by_type(type: "str") -> "table":
 @doc_extractor
 def get_count_meds() -> "int":
     """
-    Returns the total count of med records for the current patient.
+    Returns the total count of medication records for the current patient.
     Raises:
 
     ValueError: if the db has gone away.
