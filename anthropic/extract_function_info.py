@@ -4,7 +4,7 @@ from pprint import pprint
 import os
 import psycopg2
 from dotenv import load_dotenv
-from dict_to_pretty_xml import dict_to_pretty_xml
+from anthropic.dict_to_pretty_xml import dict_to_pretty_xml
 import re
 
 load_dotenv()
@@ -49,6 +49,8 @@ def get_all_tables() -> str:
             connection.close()
 
 # some comment
+
+
 def get_table_schema(table_name: str) -> str:
     """
     Retrieves the schema (structure) of a specific table in a PostgreSQL database using environment variables.
@@ -331,6 +333,7 @@ def get_count_labs() -> "int":
     int: The total count of lab records.
     """
     return run_sql("SELECT COUNT(*) from lab_data")
+
 
 @doc_extractor
 def get_count_labs() -> "int":
