@@ -207,7 +207,8 @@ def search_notes(search_str: "str") -> "table":
     Returns:
     table: A table of medical record notes.
     """
-    return run_sql("SELECT * FROM notes_data WHERE note_type ILIKE '%{search_str}%' OR note_content ILIKE '%{search_str}%'")
+
+    return run_sql(f"SELECT * FROM notes_data WHERE note_type ILIKE '%{search_str}%' OR note_content ILIKE '%{search_str}%'")
 
 
 @doc_extractor
