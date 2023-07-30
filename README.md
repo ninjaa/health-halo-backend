@@ -1,6 +1,6 @@
 # Health Halo Backend
 
-Demo from the Anthropic Hackathon 2023-07-30
+Demo for Anthropic Hackathon 2023-07-30
 
 ## Installation instructions
 
@@ -31,6 +31,16 @@ It contains DB credentials but you need to put in your Anthropic API KEY.
 
 ```bash
 python server.py
+```
+
+### Usage
+
+Requires the matching Health Halo Frontend. Find repo and installation instructions on Github [here](https://github.com/ninjaa/health-halo-frontend).
+
+To test the notification system, we have an example of a message that causes an SMS notification
+
+```bash
+./insert-lab_result.sh
 ```
 
 ## Scratch
