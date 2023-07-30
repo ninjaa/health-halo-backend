@@ -2,12 +2,12 @@ from flask import Flask, stream_with_context, request, Response, make_response
 from dotenv import load_dotenv
 import psycopg2
 import os
-from pprint import pprint
 from tabulate import tabulate
 import functools
 import time
 import re
 from anthropic2.dict_to_pretty_xml import dict_to_pretty_xml
+from twilio.rest import Client
 
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 anthropic = Anthropic(
@@ -361,6 +361,34 @@ def get_count_meds() -> "int":
     int: The total count of med records.
     """
     return run_sql("SELECT COUNT(*) from med_data")
+
+
+@doc_extractor
+def notify_team_by_sms(message: "str") -> "str":
+    """
+    Sends a message to the team via SMS. Please note the message should be less than 300 characters
+
+    Arguments:
+    message (str): The message to send (less than 300 characters!).
+
+    Raises:
+    ValueError: if the SMS service has gone away or failed.
+
+    Returns:
+    str: A confirmation message.
+    """
+    account_sid = os.environ['TWILIO_ACCOUNT_SID']
+    auth_token = os.environ['TWILIO_AUTH_TOKEN']
+    client = Client(account_sid, auth_token)
+
+    message = client.messages \
+        .create(
+            body=message,
+            from_=os.environ['TWILIO_PHONE_NUMBER'],
+            to=os.environ['TWILIO_TEAM_PHONE_NUMBER']
+        )
+
+    return f"Message sent: {message}"
 
 
 XML_FUNCTION_DEFINITIONS = dict_to_pretty_xml(functions)

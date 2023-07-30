@@ -23,6 +23,7 @@ statsmodels = "^0.14.0"
 plotly = "^5.15.0"
 cufflinks = "^0.17.3"
 anthropic = "^0.3.6"
+twilio = "^8.5.0"
 
 
 [build-system]
