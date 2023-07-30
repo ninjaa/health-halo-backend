@@ -158,7 +158,7 @@ def get_notes(start_index: "int", end_index: "int") -> "table":
     ValueError: if the db has gone away.
 
     Returns:
-    table: A table of medical record notes. remember to always cite the source URL if you use information from the notes.
+    table: A table of medical record notes. ALWAYS remember to cite information from notes eg [Progress Note](http://localhost:8000/notes/4). NEVER include links that aren't to note sources.
     """
     return run_sql("SELECT * FROM notes_data LIMIT 5")
 
@@ -181,7 +181,7 @@ def get_notes_by_type(type: "str") -> "table":
     - Distinct note types (can change on an ad-hoc basis): "Social Work Screen Comments", "Review of Systems Documentation", "Social Work Clinical Assessment", "PT Precaution", "ICU Weekly Summary Nursing", "ICU Progress (Systems) Nursing", "Central Vascular Catheter Procedure", "Procedure Note", "Genetics Consultation", "Subjective Statement PT", "NICU Admission MD", "General Surgery ICU Progress MD", "Case Management Planning", "Lactation Support Consultation", "Final", "RN Shift Events", "Occupational Therapy Inpatient", "Education Topic Details", "Lab Order/Specimen Not Received Notify", "Report", "cm reason for admission screening tool", "Chief Complaint PT", "Echocardiogram Note", "Assessment and Plan - No Dx", "History of Present Illness Documentation", "Powerplan Not Completed Notification", "PT Treatment Recommendations", "Gram", "Surgery - Patient Summary", "Reason for Referral PT", "Development Comments", "Chaplaincy Inpatient", "Nutrition Consultation", "ICU Admission Nursing", "Inpatient Nursing", "Endocrinology Consultation", "Case Management Note", "Social Work Inpatient Confidential", "General Surgery Admission MD", "Nursing Admission Assessment.", "Hospital Course", "NICU Progress MD", "Physical Examination Documentation", "General Surgery Inpatient MD", "Preliminary Report", "NICU Note Overall Impression"
 
     Returns:
-    table: A table of medical record notes. remember to always cite the source URL if you use information from the notes.
+    table: A table of medical record notes. ALWAYS remember to cite information from notes eg [Progress Note](http://localhost:8000/notes/4). NEVER include links that aren't to note sources.
     """
     return run_sql("SELECT * FROM notes_data WHERE note_type ILIKE '%{type}%'")
 
@@ -212,7 +212,7 @@ def search_notes(search_str: "str") -> "table":
 
 
 @doc_extractor
-def get_labs(start_index: "int", end_index: "int") -> "table":
+def get_labs(start_index: "int" = 0, end_index: "int" = 10) -> "table":
     """
     Fetches lab data for the current patient from `start_index` to `end_index`.
 
@@ -229,7 +229,7 @@ def get_labs(start_index: "int", end_index: "int") -> "table":
     - Distinct lab values (can change on an ad-hoc basis: "Lysine Level", "Oxygen dissociation p50, Capillary", "Phenylalanine Level", "Leukocytes, Urinalysis", "Hemoglobin", "Aspartic Acid Level", "Triglycerides", "Ovalocytes, RBC", "Vancomycin Level, Trough/Pre", "Myelocyte", "Magnesium", "Lactic Acid, Whole Blood", "Bicarb Arterial", "Platelet", "Albumin", "Reflex Sysmex", "Beta-Hydroxybutyric Acid", "Glutamine Level", "Proline Level", "Taurine Level", "Absolute Phagocyte Count", "Chloride", "Blood Culture Routine, Aerobic", "pO2 Venous", "Protein, Urinalysis", "ALT", "Cortisol", "Nitrite,   Urinalysis", "Tryptophan Level", "Neutrophil/Band", "Metamyelocyte", "Carnitine Free/Total", "Immature Reticulocyte Fraction", "pCO2 Venous", "pCO2 Capillary", "Sodium", "Cystine Level", "LDH (Lactate Dehydrogenase)", "Monocyte", "Glucose, Urinalysis", "pH Arterial", "Absolute Eosinophil Count", "RBC", "Bicarb Capillary", "Newborn Screen Result", "Creatinine", "Valine Level", "MPV", "Serine Level", "CO2", "Absolute Basophil Count", "Specific Gravity, Urinalysis", "MCHC", "Leucine Level", "Tyrosine Level", "Glucose Level", "Calcium Ionized", "Absolute Lymphocyte Count", "Lymphocyte", "pH Capillary", "Oxygen dissociation p50, Arterial", "Ketone, Urinalysis", "Glutamic Acid Level", "Anisocytosis, RBC", "Hydroxyproline Level", "Reticulocyte %", "Final", "pH Venous", "Target Cells, RBC", "Ketone Qualitative Source, Other Fluid", "Promyelocyte", "Basophil", "Poikilocytosis, RBC", "Immature Platelet Fraction", "RBC Morph", "Atypical Lymphocyte", "Elliptocytosis, RBC", "O2Sat Arterial", "Blast", "Microcytosis, RBC", "Anion Gap, Whole Blood", "Total Protein", "Potassium", "Methionine Level", "Glycine Level", "Sodium, Whole Blood", "Stomatocytes, RBC", "WBC", "Prolymphocyte", "Alkaline Phosphatase", "Isoleucine Level", "Arginine Level", "Chloride, Whole Blood", "Anion Gap", "Hematocrit", "pO2 Capillary", "Urobilinogen,   Urinalysis", "Asparagine Level", "MCV", "Bilirubin, Urinalysis", "Alanine Level", "Carnitine Free", "Urine Culture", "Nucleated Red Blood Cell %", "Prealbumin", "O2Sat Capillary", "Ornithine Level", "Absolute Monocyte Count", "Histidine Level", "BUN", "Threonine Level", "Color, Urinalysis", "Insulin Level", "Schistocytes, RBC", "pH, Urinalysis", "MCH", "Bilirubin, Direct", "pO2 Arterial", "Phosphorus", "Calcium", "Human Growth Hormone, Random", "Potassium, Whole Blood", "Macrocytosis, RBC", "Appearance, Urinalysis", "Glucose, Whole Blood", "Blood, Urinalysis", "Ketone Qualitative, Other Fluid", "Citrulline Level", "Carnitine Total", "Nucleated Red Blood Cell Count", "Absolute Neutrophil Count", "Bilirubin, Total", "Reticulocyte Cell Hemoglobin", "Reticulocyte, Absolute", "VRE Culture, Rectal", "Respiratory Culture and Gram Stain", "Red Cell Distribution Width CV", "Bicarb Venous", "Oxygen dissociation p50, Venous", "Eosinophil", "O2 Sat Venous", "MRSA Culture", "pCO2 Arterial"
 
     Returns:
-    table: A table of medical record lab results.
+    table: A table of medical record lab results. ALWAYS remember to cite information from notes eg [Progress Note](http://localhost:8000/notes/4). NEVER include links that aren't to note sources.
     """
     return run_sql("SELECT * FROM lab_data LIMIT 10")
 
@@ -307,7 +307,7 @@ def search_labs(search_str: "str") -> "table":
 
 
 @doc_extractor
-def get_meds(start_index: "int", end_index: "int") -> "table":
+def get_meds(start_index: "int" = 0, end_index: "int" = 10) -> "table":
     """
     Fetches medications listings for the current patient from `start_index` to `end_index`.
 
@@ -382,6 +382,34 @@ def get_initial_prompt(question):
 
 {XML_FUNCTION_DEFINITIONS}
 
+Here is an example of how you would correctly answer a question using a <function_call> and the corresponding <function_result>. Notice that you are free to think before deciding to make a <function_call> in the <scratchpad>:
+​
+<example>
+<functions>
+<function>
+<function_name>get_current_temp</function_name>
+<function_description>Gets the current temperature for a given city.</function_description>
+<required_argument>city (str): The name of the city to get the temperature for.</required_argument>
+<returns>int: The current temperature in degrees Fahrenheit.</returns>
+<raises>ValueError: If city is not a valid city name.</raises>
+<example_call>get_current_temp(city=\"New York\")</example_call>
+</function>
+</functions>
+​
+<question>What is the current temperature in San Francisco?</question>
+​
+<scratchpad>I do not have access to the current temperature in San Francisco so I should use a function to gather more information to answer this question. I have been equipped with the function get_current_temp that gets the current temperature for a given city so I should use that to gather more information.
+​
+I have double checked and made sure that I have been provided the get_current_temp function.
+</scratchpad>
+​
+<function_call>get_current_temp(city=\"San Francisco\")</function_call>
+​
+<function_result>71</function_result>
+​
+<answer>The current temperature in San Francisco is 71 degrees Fahrenheit.</answer>
+</example>
+​
 
 Note that the function arguments have been listed in the order that they should be passed into the function.
 
@@ -397,16 +425,40 @@ Remember, your goal is to answer the user's question to the best of your ability
 
 Do not modify or extend the provided functions under any circumstances. For example, calling get_current_temp() with additional parameters would be modifying the function which is not allowed. Please use the functions only as defined.
 
-The result of a function call will be added to the conversation history as an observation. Never make up the function result, just open the tag and let the Human insert the resul. If necessary, you can make multiple function calls and use all the functions I have equipped you with. Let's create a plan and then execute the plan. Double check your plan to make sure you don't call any functions that I haven't provided. Always return your final answer within  <answer></answer> tags and use markdown format. IMPORTANT: if you reference information from the patient notes, always include the source of each note in the answer in markdown format. eg [source](https://www.google.com)
+The result of a function call will be added to the conversation history as an observation. Never make up the function result, just open the tag and let the Human insert the resul. If necessary, you can make multiple function calls and use all the functions I have equipped you with. Let's create a plan and then execute the plan. Double check your plan to make sure you don't call any functions that I haven't provided. Always return your final answer within  <answer></answer> tags and use markdown format. IMPORTANT: if you reference information from the patient notes, always include the source of each note in the answer in markdown format. eg [Progress Note](http://localhost:8000/notes/4). never include links that aren't to note sources. you should keep the source URL in the scratchpad so you can include it in your final answer.
 
 The question to answer is <question>{question}</question>
     
     
-    {AI_PROMPT}<scratchpad> I understand I cannot use functions that have not been provided to me to answer this question. I will ALWAYS remember to cite my sources if I reference information from patient notes.
+    {AI_PROMPT}<scratchpad> I understand I cannot use functions that have not been provided to me to answer this question. I will ALWAYS remember to cite information from notes eg [Progress Note](http://localhost:8000/notes/4). I will never include links that aren't to note sources.
     """
     return INITIAL_PROMPT
 
-
+def function_action(function_name):
+    if function_name == "get_notes":
+        return "Fetching medical record notes..."
+    elif function_name == "get_notes_by_type":
+        return "Fetching medical record notes filtered by note type..."
+    elif function_name == "search_notes":
+        return "Searching the medical record notes..."
+    elif function_name == "get_labs":
+        return "Fetching lab data..."
+    elif function_name == "get_labs_by_type":
+        return "Fetching lab data filtered by lab type..."
+    elif function_name == "get_count_notes":
+        return "Fetching the total count of medical record notes..."
+    elif function_name == "get_count_labs":
+        return "Fetching the total count of lab records..."
+    elif function_name == "search_labs":
+        return "Searching the lab data..."
+    elif function_name == "get_meds":
+        return "Fetching medications..."
+    elif function_name == "get_meds_by_type":
+        return "Fetching medication data filtered by medication type..."
+    elif function_name == "get_count_meds":
+        return "Fetching the total count of medication records..."
+    else:
+        return "Unknown function action..."
 app = Flask(__name__)
 @app.route('/notes/<int:note_id>', methods=['GET'])
 def get_note(note_id):
@@ -448,7 +500,7 @@ def get_note(note_id):
 def conduct_chat_endpoint():
     initial_messages = request.json.get('initial_messages')
     last_message = initial_messages[-1]
-    question = last_message['content']
+    question = last_message['content'] + " - remember to include the sources to notes if you reference any information from them!"
 
     def conduct_chat():
         current_prompt = get_initial_prompt(question)
@@ -489,8 +541,8 @@ def conduct_chat_endpoint():
                     function_call_content = function_call_match.group(
                         1) if function_call_match else None
                     print(function_call_content)
-
-                    yield '**⚙️ Calling function**\n\n'
+                    function_name = function_call_content.split("(")[0]
+                    yield f'**⚙️ {function_action(function_name)}**\n\n'
 
                     result = eval(function_call_content)
                     current_prompt = current_prompt + buffer + \
