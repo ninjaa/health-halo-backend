@@ -1,7 +1,41 @@
-# anthropic-function-calling
-From the Hackathon
+# Health Halo Backend
 
-Function definition syntax
+Demo from the Anthropic Hackathon 2023-07-30
+
+## Installation instructions
+
+### Prerequisites
+
+- Python 3.11
+- Poetry
+
+### Steps
+
+```bash
+poetry install
+poetry shell
+```
+
+### Configuration
+
+We are connecting to the 'clinical' db.
+
+Right now it contains lab_data, notes_data
+
+Copy the .env.example => .env
+It contains DB credentials but you need to put in your Anthropic API KEY.
+
+**API KEY should not be rate limited**
+
+### How to run
+
+```bash
+python server.py
+```
+
+## Scratch
+
+### Function definition syntax
 
 ```xml
 <function>
@@ -15,6 +49,7 @@ Function definition syntax
 ```
 
 in other words, python dict
+
 ```python
 functions = [{
   "name": "get_current_temp",
@@ -25,23 +60,3 @@ functions = [{
   "example_call": "get_current_temp(city=\"New York\")"
 }]
 ```
-
-## Installation instructions
-
-### Prerequisites
-
-- Python 3.11
-- Poetry
-
-### Steps
-
-```bash
-poetry install
-```
-
-### Configuration
-
-We are connecting to the 'clinical' db.
-
-Right now it contains lab_data, notes_data
-

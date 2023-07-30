@@ -5,7 +5,7 @@ import os
 from tabulate import tabulate
 import functools
 import re
-from anthropic2.dict_to_pretty_xml import dict_to_pretty_xml
+from hh_lib.dict_to_pretty_xml import dict_to_pretty_xml
 from twilio.rest import Client
 from dotenv import load_dotenv
 
