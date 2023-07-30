@@ -1,3 +1,4 @@
+from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 from flask import Flask, stream_with_context, request, Response, make_response
 from dotenv import load_dotenv
 import psycopg2
@@ -11,7 +12,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 anthropic = Anthropic(
     api_key=os.getenv("ANTHROPIC_API_KEY"))
 
@@ -536,9 +536,10 @@ def conduct_chat_endpoint():
     last_message = initial_messages[-1]
     if "content" in last_message:
         question = last_message['content'] + \
-        " - remember to include the sources to notes if you reference any information from them!"
+            " - remember to include the sources to notes if you reference any information from them!"
     elif "lab_result" in last_message:
-        question = last_message['lab_result'] + " - remember this is new information not yet in the database! So please consider it very fresh and accurate."
+        question = last_message['lab_result'] + \
+            " - remember this is new information not yet in the database! So please consider it very fresh and accurate."
 
     def conduct_chat():
         current_prompt = get_initial_prompt(question)
