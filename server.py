@@ -146,13 +146,9 @@ def doc_extractor(func):
 
 
 @doc_extractor
-def get_notes(start_index: "int", end_index: "int") -> "table":
+def get_notes() -> "table":
     """
-    Fetches medical record notes for the current patient from `start_index` to `end_index`.
-
-    Arguments:
-    start_index (int): The starting index for the notes retrieval.
-    end_index (int): The ending index for the notes retrieval.
+    Fetches 5 latest medical record notes for the current patient.
 
     Raises:
     ValueError: if the db has gone away.
@@ -160,7 +156,7 @@ def get_notes(start_index: "int", end_index: "int") -> "table":
     Returns:
     table: A table of medical record notes. ALWAYS remember to cite information from notes eg [Progress Note](http://localhost:8000/notes/4). NEVER include links that aren't to note sources.
     """
-    return run_sql("SELECT * FROM notes_data LIMIT 5")
+    return run_sql("SELECT * FROM notes_data ORDER BY date DESC LIMIT 5")
 
 
 @doc_extractor
@@ -212,9 +208,9 @@ def search_notes(search_str: "str") -> "table":
 
 
 @doc_extractor
-def get_labs(start_index: "int" = 0, end_index: "int" = 10) -> "table":
+def get_labs() -> "table":
     """
-    Fetches lab data for the current patient from `start_index` to `end_index`.
+    Fetches 30 latest lab data results for patient.
 
     Arguments:
     start_index (int): The starting index for the lab data retrieval.
@@ -231,7 +227,7 @@ def get_labs(start_index: "int" = 0, end_index: "int" = 10) -> "table":
     Returns:
     table: A table of medical record lab results. ALWAYS remember to cite information from notes eg [Progress Note](http://localhost:8000/notes/4). NEVER include links that aren't to note sources.
     """
-    return run_sql("SELECT * FROM lab_data LIMIT 10")
+    return run_sql("SELECT * FROM lab_data ORDER BY date DESC LIMIT 30")
 
 
 @doc_extractor
@@ -256,32 +252,32 @@ def get_labs_by_type(type: "str") -> "table":
     return run_sql(f"SELECT * FROM lab_data WHERE lab ILIKE '%{type}%'")
 
 
-@doc_extractor
-def get_count_notes() -> "int":
-    """
-    Returns the total count of medical record notes for the current patient.
+# @doc_extractor
+# def get_count_notes() -> "int":
+#     """
+#     Returns the total count of medical record notes for the current patient.
 
-    Raises:
-    ValueError: if the db has gone away.
+#     Raises:
+#     ValueError: if the db has gone away.
 
-    Returns:
-    int: The total count of medical record notes.
-    """
-    return run_sql("SELECT COUNT(*) from notes_data")
+#     Returns:
+#     int: The total count of medical record notes.
+#     """
+#     return run_sql("SELECT COUNT(*) from notes_data")
 
 
-@doc_extractor
-def get_count_labs() -> "int":
-    """
-    Returns the total count of lab records for the current patient.
+# @doc_extractor
+# def get_count_labs() -> "int":
+#     """
+#     Returns the total count of lab records for the current patient.
 
-    Raises:
-    ValueError: if the db has gone away.
+#     Raises:
+#     ValueError: if the db has gone away.
 
-    Returns:
-    int: The total count of lab records.
-    """
-    return run_sql("SELECT COUNT(*) from lab_data")
+#     Returns:
+#     int: The total count of lab records.
+#     """
+#     return run_sql("SELECT COUNT(*) from lab_data")
 
 
 @doc_extractor
@@ -349,18 +345,18 @@ def get_meds_by_type(type: "str") -> "table":
     return run_sql(f"SELECT * FROM med_data WHERE type ILIKE '%{type}%' LIMIT 10")
 
 
-@doc_extractor
-def get_count_meds() -> "int":
-    """
-    Returns the total count of medication records for the current patient.
-    Raises:
+# @doc_extractor
+# def get_count_meds() -> "int":
+#     """
+#     Returns the total count of medication records for the current patient.
+#     Raises:
 
-    ValueError: if the db has gone away.
+#     ValueError: if the db has gone away.
 
-    Returns:
-    int: The total count of med records.
-    """
-    return run_sql("SELECT COUNT(*) from med_data")
+#     Returns:
+#     int: The total count of med records.
+#     """
+#     return run_sql("SELECT COUNT(*) from med_data")
 
 
 @doc_extractor
@@ -399,9 +395,9 @@ print(XML_FUNCTION_DEFINITIONS)
 def get_initial_prompt(question):
     TODAYS_DATE_STRING = "2023-06-08 12:35:02"
 
-    INITIAL_PROMPT = f"""{HUMAN_PROMPT} 
-    You are the world's most advanced medical research assistant AI that has been equipped with the following function(s) to help you answer a <question>. 
-    Your goal is to answer the user's question to the best of your ability, using the function(s) to gather more information if necessary 
+    INITIAL_PROMPT = f"""{HUMAN_PROMPT}
+    You are the world's most advanced medical research assistant AI that has been equipped with the following function(s) to help you answer a <question>.
+    Your goal is to answer the user's question to the best of your ability, using the function(s) to gather more information if necessary
     to better answer the question. The result of a function call will be added to the conversation history as an observation. if you are unsure of where to find information, check patient notes. ALWAYS cite the source URL if you use information from the notes!
 
     Here are the only function(s) I have provided you with:
@@ -456,11 +452,12 @@ Do not modify or extend the provided functions under any circumstances. For exam
 The result of a function call will be added to the conversation history as an observation. Never make up the function result, just open the tag and let the Human insert the resul. If necessary, you can make multiple function calls and use all the functions I have equipped you with. Let's create a plan and then execute the plan. Double check your plan to make sure you don't call any functions that I haven't provided. Always return your final answer within  <answer></answer> tags and use markdown format. IMPORTANT: if you reference information from the patient notes, always include the source of each note in the answer in markdown format. eg [Progress Note](http://localhost:8000/notes/4). never include links that aren't to note sources. you should keep the source URL in the scratchpad so you can include it in your final answer.
 
 The question to answer is <question>{question}</question>
-    
-    
+
+
     {AI_PROMPT}<scratchpad> I understand I cannot use functions that have not been provided to me to answer this question. I will ALWAYS remember to cite information from notes eg [Progress Note](http://localhost:8000/notes/4). I will never include links that aren't to note sources.
     """
     return INITIAL_PROMPT
+
 
 def function_action(function_name):
     if function_name == "get_notes":
@@ -489,7 +486,11 @@ def function_action(function_name):
         return "Sending a message to the team via SMS..."
     else:
         return "Executing..."
+
+
 app = Flask(__name__)
+
+
 @app.route('/notes/<int:note_id>', methods=['GET'])
 def get_note(note_id):
     # Connect to your database
@@ -516,10 +517,11 @@ def get_note(note_id):
         cursor.close()
         connection.close()
         if rows:
-                note_content = rows[0][0]
-                resp = make_response(f'<html><body><h1 style="font-size: 2em;">{note_content}</h1></body></html>')
-                resp.headers["Content-type"] = "text/html"
-                return resp
+            note_content = rows[0][0]
+            resp = make_response(
+                f'<html><body><h1 style="font-size: 2em;">{note_content}</h1></body></html>')
+            resp.headers["Content-type"] = "text/html"
+            return resp
         # return only the content of the note, which is assumed to be in the first column of the first row
         return rows[0][0] if rows else Response("Note not found", status=404)
     except Exception as e:
@@ -530,7 +532,8 @@ def get_note(note_id):
 def conduct_chat_endpoint():
     initial_messages = request.json.get('initial_messages')
     last_message = initial_messages[-1]
-    question = last_message['content'] + " - remember to include the sources to notes if you reference any information from them!"
+    question = last_message['content'] + \
+        " - remember to include the sources to notes if you reference any information from them!"
 
     def conduct_chat():
         current_prompt = get_initial_prompt(question)
@@ -574,7 +577,10 @@ def conduct_chat_endpoint():
                     function_name = function_call_content.split("(")[0]
                     yield f'**⚙️ {function_action(function_name)}**\n\n'
 
-                    result = eval(function_call_content)
+                    try:
+                        result = eval(function_call_content)
+                    except Exception as e:
+                        result = f"Error: {e}"
                     current_prompt = current_prompt + buffer + \
                         "<function_result>" + result + "</function_result>"
                     break
