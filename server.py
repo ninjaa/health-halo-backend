@@ -1,21 +1,23 @@
+from dotenv import load_dotenv
+import psycopg2
+import os
+from pprint import pprint
+from tabulate import tabulate
+import functools
 from flask import Flask, stream_with_context, request, Response
 import time
 import re
+from anthropic2.dict_to_pretty_xml import dict_to_pretty_xml
 
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
-anthropic = Anthropic(api_key=***REMOVED***)
+anthropic = Anthropic(
+    api_key=***REMOVED***)
 
-import functools
-from tabulate import tabulate
-from pprint import pprint
-import os
-import psycopg2
-from dotenv import load_dotenv
 # from dict_to_pretty_xml import dict_to_pretty_xml
-import re
 
 
 load_dotenv()
+
 
 def run_sql(query):
     # Connect to your database
@@ -161,7 +163,6 @@ def get_notes(start_index: "int", end_index: "int") -> "table":
     return run_sql("SELECT * FROM notes_data LIMIT 5")
 
 
-
 @doc_extractor
 def get_notes_by_type(type: "str") -> "table":
     """
@@ -183,6 +184,29 @@ def get_notes_by_type(type: "str") -> "table":
     table: A table of medical record notes.
     """
     return run_sql("SELECT * FROM notes_data WHERE note_type ILIKE '%{type}%'")
+
+
+@doc_extractor
+def search_notes(search_str: "str") -> "table":
+    """
+    Searches medical record notes for the current patient filtered by the note type provided.
+
+    Arguments:
+    search_str (str): search string to search by.
+
+    Raises:
+    ValueError: if the db has gone away.
+
+    Details:
+    - Here is the underlying table schema:
+    - Table: notes_data
+    - Columns: id, date, note_type, note_content, source_url
+    - Distinct note types (can change on an ad-hoc basis): "Social Work Screen Comments", "Review of Systems Documentation", "Social Work Clinical Assessment", "PT Precaution", "ICU Weekly Summary Nursing", "ICU Progress (Systems) Nursing", "Central Vascular Catheter Procedure", "Procedure Note", "Genetics Consultation", "Subjective Statement PT", "NICU Admission MD", "General Surgery ICU Progress MD", "Case Management Planning", "Lactation Support Consultation", "Final", "RN Shift Events", "Occupational Therapy Inpatient", "Education Topic Details", "Lab Order/Specimen Not Received Notify", "Report", "cm reason for admission screening tool", "Chief Complaint PT", "Echocardiogram Note", "Assessment and Plan - No Dx", "History of Present Illness Documentation", "Powerplan Not Completed Notification", "PT Treatment Recommendations", "Gram", "Surgery - Patient Summary", "Reason for Referral PT", "Development Comments", "Chaplaincy Inpatient", "Nutrition Consultation", "ICU Admission Nursing", "Inpatient Nursing", "Endocrinology Consultation", "Case Management Note", "Social Work Inpatient Confidential", "General Surgery Admission MD", "Nursing Admission Assessment.", "Hospital Course", "NICU Progress MD", "Physical Examination Documentation", "General Surgery Inpatient MD", "Preliminary Report", "NICU Note Overall Impression"
+
+    Returns:
+    table: A table of medical record notes.
+    """
+    return run_sql("SELECT * FROM notes_data WHERE note_type ILIKE '%{search_str}%' OR note_content ILIKE '%{search_str}%'")
 
 
 @doc_extractor
@@ -256,6 +280,33 @@ def get_count_labs() -> "int":
     int: The total count of lab records.
     """
     return run_sql("SELECT COUNT(*) from lab_data")
+
+
+@doc_extractor
+def search_labs(search_str: "str") -> "table":
+    """
+    Seraches lab data for the current patient from `start_index` to `end_index`.
+
+    Arguments:
+    search_str (int): search string.
+
+    Raises:
+    ValueError: if the db has gone away.
+
+    Details:
+    - Table: lab_data
+    - Columns: id, date, source, lab, value, units, normal_low, normal_high, critical_low, critical_high
+    - Distinct lab values (can change on an ad-hoc basis: "Lysine Level", "Oxygen dissociation p50, Capillary", "Phenylalanine Level", "Leukocytes, Urinalysis", "Hemoglobin", "Aspartic Acid Level", "Triglycerides", "Ovalocytes, RBC", "Vancomycin Level, Trough/Pre", "Myelocyte", "Magnesium", "Lactic Acid, Whole Blood", "Bicarb Arterial", "Platelet", "Albumin", "Reflex Sysmex", "Beta-Hydroxybutyric Acid", "Glutamine Level", "Proline Level", "Taurine Level", "Absolute Phagocyte Count", "Chloride", "Blood Culture Routine, Aerobic", "pO2 Venous", "Protein, Urinalysis", "ALT", "Cortisol", "Nitrite,   Urinalysis", "Tryptophan Level", "Neutrophil/Band", "Metamyelocyte", "Carnitine Free/Total", "Immature Reticulocyte Fraction", "pCO2 Venous", "pCO2 Capillary", "Sodium", "Cystine Level", "LDH (Lactate Dehydrogenase)", "Monocyte", "Glucose, Urinalysis", "pH Arterial", "Absolute Eosinophil Count", "RBC", "Bicarb Capillary", "Newborn Screen Result", "Creatinine", "Valine Level", "MPV", "Serine Level", "CO2", "Absolute Basophil Count", "Specific Gravity, Urinalysis", "MCHC", "Leucine Level", "Tyrosine Level", "Glucose Level", "Calcium Ionized", "Absolute Lymphocyte Count", "Lymphocyte", "pH Capillary", "Oxygen dissociation p50, Arterial", "Ketone, Urinalysis", "Glutamic Acid Level", "Anisocytosis, RBC", "Hydroxyproline Level", "Reticulocyte %", "Final", "pH Venous", "Target Cells, RBC", "Ketone Qualitative Source, Other Fluid", "Promyelocyte", "Basophil", "Poikilocytosis, RBC", "Immature Platelet Fraction", "RBC Morph", "Atypical Lymphocyte", "Elliptocytosis, RBC", "O2Sat Arterial", "Blast", "Microcytosis, RBC", "Anion Gap, Whole Blood", "Total Protein", "Potassium", "Methionine Level", "Glycine Level", "Sodium, Whole Blood", "Stomatocytes, RBC", "WBC", "Prolymphocyte", "Alkaline Phosphatase", "Isoleucine Level", "Arginine Level", "Chloride, Whole Blood", "Anion Gap", "Hematocrit", "pO2 Capillary", "Urobilinogen,   Urinalysis", "Asparagine Level", "MCV", "Bilirubin, Urinalysis", "Alanine Level", "Carnitine Free", "Urine Culture", "Nucleated Red Blood Cell %", "Prealbumin", "O2Sat Capillary", "Ornithine Level", "Absolute Monocyte Count", "Histidine Level", "BUN", "Threonine Level", "Color, Urinalysis", "Insulin Level", "Schistocytes, RBC", "pH, Urinalysis", "MCH", "Bilirubin, Direct", "pO2 Arterial", "Phosphorus", "Calcium", "Human Growth Hormone, Random", "Potassium, Whole Blood", "Macrocytosis, RBC", "Appearance, Urinalysis", "Glucose, Whole Blood", "Blood, Urinalysis", "Ketone Qualitative, Other Fluid", "Citrulline Level", "Carnitine Total", "Nucleated Red Blood Cell Count", "Absolute Neutrophil Count", "Bilirubin, Total", "Reticulocyte Cell Hemoglobin", "Reticulocyte, Absolute", "VRE Culture, Rectal", "Respiratory Culture and Gram Stain", "Red Cell Distribution Width CV", "Bicarb Venous", "Oxygen dissociation p50, Venous", "Eosinophil", "O2 Sat Venous", "MRSA Culture", "pCO2 Arterial"
+
+    Returns:
+    table: A table of medical record lab results.
+    """
+    return run_sql(f"SELECT * FROM lab_data WHERE lab ILIKE '%{search_str}%' OR source ILIKE '%{search_str}%'")
+
+
+XML_FUNCTION_DEFINITIONS = dict_to_pretty_xml(functions)
+
+
 def get_initial_prompt(question):
     TODAYS_DATE_STRING = "2023-06-08 12:35:02"
 
@@ -268,50 +319,7 @@ def get_initial_prompt(question):
 
     Today's date is {TODAYS_DATE_STRING}.
 
-<functions>
-  <function>
-    <function_name>get_notes</function_name>
-    <function_description>Fetches medical record notes for the current patient from `start_index` to `end_index`.</function_description>
-    <required_argument>start_index (int): The starting index for the notes retrieval.</required_argument>
-    <required_argument>end_index (int): The ending index for the notes retrieval.</required_argument>
-    <returns>table: table: A table of medical record notes.</returns>
-    <example_call>get_notes(start_index=value, end_index=value)</example_call>
-  </function>
-  <function>
-    <function_name>get_notes_by_type</function_name>
-    <function_description>Fetches medical record notes for the current patient filtered by the note type provided. - Here is the underlying table schema: - Table: notes_data - Columns: id, date, note_type, note_content, source_url - Distinct note types (can change on an ad-hoc basis): "Social Work Screen Comments", "Review of Systems Documentation", "Social Work Clinical Assessment", "PT Precaution", "ICU Weekly Summary Nursing", "ICU Progress (Systems) Nursing", "Central Vascular Catheter Procedure", "Procedure Note", "Genetics Consultation", "Subjective Statement PT", "NICU Admission MD", "General Surgery ICU Progress MD", "Case Management Planning", "Lactation Support Consultation", "Final", "RN Shift Events", "Occupational Therapy Inpatient", "Education Topic Details", "Lab Order/Specimen Not Received Notify", "Report", "cm reason for admission screening tool", "Chief Complaint PT", "Echocardiogram Note", "Assessment and Plan - No Dx", "History of Present Illness Documentation", "Powerplan Not Completed Notification", "PT Treatment Recommendations", "Gram", "Surgery - Patient Summary", "Reason for Referral PT", "Development Comments", "Chaplaincy Inpatient", "Nutrition Consultation", "ICU Admission Nursing", "Inpatient Nursing", "Endocrinology Consultation", "Case Management Note", "Social Work Inpatient Confidential", "General Surgery Admission MD", "Nursing Admission Assessment.", "Hospital Course", "NICU Progress MD", "Physical Examination Documentation", "General Surgery Inpatient MD", "Preliminary Report", "NICU Note Overall Impression"  Returns: table: A table of medical record notes.</function_description>
-    <required_argument>type (str): The type of note to be retrieved.</required_argument>
-    <returns>table: table: A table of medical record notes.</returns>
-    <example_call>get_notes_by_type(type=value)</example_call>
-  </function>
-  <function>
-    <function_name>get_labs</function_name>
-    <function_description>Fetches lab data for the current patient from `start_index` to `end_index`. - Table: lab_data - Columns: id, date, source, lab, value, units, normal_low, normal_high, critical_low, critical_high - Distinct lab values (can change on an ad-hoc basis: "Lysine Level", "Oxygen dissociation p50, Capillary", "Phenylalanine Level", "Leukocytes, Urinalysis", "Hemoglobin", "Aspartic Acid Level", "Triglycerides", "Ovalocytes, RBC", "Vancomycin Level, Trough/Pre", "Myelocyte", "Magnesium", "Lactic Acid, Whole Blood", "Bicarb Arterial", "Platelet", "Albumin", "Reflex Sysmex", "Beta-Hydroxybutyric Acid", "Glutamine Level", "Proline Level", "Taurine Level", "Absolute Phagocyte Count", "Chloride", "Blood Culture Routine, Aerobic", "pO2 Venous", "Protein, Urinalysis", "ALT", "Cortisol", "Nitrite,   Urinalysis", "Tryptophan Level", "Neutrophil/Band", "Metamyelocyte", "Carnitine Free/Total", "Immature Reticulocyte Fraction", "pCO2 Venous", "pCO2 Capillary", "Sodium", "Cystine Level", "LDH (Lactate Dehydrogenase)", "Monocyte", "Glucose, Urinalysis", "pH Arterial", "Absolute Eosinophil Count", "RBC", "Bicarb Capillary", "Newborn Screen Result", "Creatinine", "Valine Level", "MPV", "Serine Level", "CO2", "Absolute Basophil Count", "Specific Gravity, Urinalysis", "MCHC", "Leucine Level", "Tyrosine Level", "Glucose Level", "Calcium Ionized", "Absolute Lymphocyte Count", "Lymphocyte", "pH Capillary", "Oxygen dissociation p50, Arterial", "Ketone, Urinalysis", "Glutamic Acid Level", "Anisocytosis, RBC", "Hydroxyproline Level", "Reticulocyte %", "Final", "pH Venous", "Target Cells, RBC", "Ketone Qualitative Source, Other Fluid", "Promyelocyte", "Basophil", "Poikilocytosis, RBC", "Immature Platelet Fraction", "RBC Morph", "Atypical Lymphocyte", "Elliptocytosis, RBC", "O2Sat Arterial", "Blast", "Microcytosis, RBC", "Anion Gap, Whole Blood", "Total Protein", "Potassium", "Methionine Level", "Glycine Level", "Sodium, Whole Blood", "Stomatocytes, RBC", "WBC", "Prolymphocyte", "Alkaline Phosphatase", "Isoleucine Level", "Arginine Level", "Chloride, Whole Blood", "Anion Gap", "Hematocrit", "pO2 Capillary", "Urobilinogen,   Urinalysis", "Asparagine Level", "MCV", "Bilirubin, Urinalysis", "Alanine Level", "Carnitine Free", "Urine Culture", "Nucleated Red Blood Cell %", "Prealbumin", "O2Sat Capillary", "Ornithine Level", "Absolute Monocyte Count", "Histidine Level", "BUN", "Threonine Level", "Color, Urinalysis", "Insulin Level", "Schistocytes, RBC", "pH, Urinalysis", "MCH", "Bilirubin, Direct", "pO2 Arterial", "Phosphorus", "Calcium", "Human Growth Hormone, Random", "Potassium, Whole Blood", "Macrocytosis, RBC", "Appearance, Urinalysis", "Glucose, Whole Blood", "Blood, Urinalysis", "Ketone Qualitative, Other Fluid", "Citrulline Level", "Carnitine Total", "Nucleated Red Blood Cell Count", "Absolute Neutrophil Count", "Bilirubin, Total", "Reticulocyte Cell Hemoglobin", "Reticulocyte, Absolute", "VRE Culture, Rectal", "Respiratory Culture and Gram Stain", "Red Cell Distribution Width CV", "Bicarb Venous", "Oxygen dissociation p50, Venous", "Eosinophil", "O2 Sat Venous", "MRSA Culture", "pCO2 Arterial"  Returns: table: A table of medical record lab results.</function_description>
-    <required_argument>start_index (int): The starting index for the lab data retrieval.</required_argument>
-    <required_argument>end_index (int): The ending index for the lab data retrieval.</required_argument>
-    <returns>table: table: A table of medical record lab results.</returns>
-    <example_call>get_labs(start_index=value, end_index=value)</example_call>
-  </function>
-  <function>
-    <function_name>get_labs_by_type</function_name>
-    <function_description>Fetches lab data for the current patient filtered by the lab type provided. - Table: lab_data - Columns: id, date, source, lab, value, units, normal_low, normal_high, critical_low, critical_high - Distinct lab values (can change on an ad-hoc basis: "Lysine Level", "Oxygen dissociation p50, Capillary", "Phenylalanine Level", "Leukocytes, Urinalysis", "Hemoglobin", "Aspartic Acid Level", "Triglycerides", "Ovalocytes, RBC", "Vancomycin Level, Trough/Pre", "Myelocyte", "Magnesium", "Lactic Acid, Whole Blood", "Bicarb Arterial", "Platelet", "Albumin", "Reflex Sysmex", "Beta-Hydroxybutyric Acid", "Glutamine Level", "Proline Level", "Taurine Level", "Absolute Phagocyte Count", "Chloride", "Blood Culture Routine, Aerobic", "pO2 Venous", "Protein, Urinalysis", "ALT", "Cortisol", "Nitrite,   Urinalysis", "Tryptophan Level", "Neutrophil/Band", "Metamyelocyte", "Carnitine Free/Total", "Immature Reticulocyte Fraction", "pCO2 Venous", "pCO2 Capillary", "Sodium", "Cystine Level", "LDH (Lactate Dehydrogenase)", "Monocyte", "Glucose, Urinalysis", "pH Arterial", "Absolute Eosinophil Count", "RBC", "Bicarb Capillary", "Newborn Screen Result", "Creatinine", "Valine Level", "MPV", "Serine Level", "CO2", "Absolute Basophil Count", "Specific Gravity, Urinalysis", "MCHC", "Leucine Level", "Tyrosine Level", "Glucose Level", "Calcium Ionized", "Absolute Lymphocyte Count", "Lymphocyte", "pH Capillary", "Oxygen dissociation p50, Arterial", "Ketone, Urinalysis", "Glutamic Acid Level", "Anisocytosis, RBC", "Hydroxyproline Level", "Reticulocyte %", "Final", "pH Venous", "Target Cells, RBC", "Ketone Qualitative Source, Other Fluid", "Promyelocyte", "Basophil", "Poikilocytosis, RBC", "Immature Platelet Fraction", "RBC Morph", "Atypical Lymphocyte", "Elliptocytosis, RBC", "O2Sat Arterial", "Blast", "Microcytosis, RBC", "Anion Gap, Whole Blood", "Total Protein", "Potassium", "Methionine Level", "Glycine Level", "Sodium, Whole Blood", "Stomatocytes, RBC", "WBC", "Prolymphocyte", "Alkaline Phosphatase", "Isoleucine Level", "Arginine Level", "Chloride, Whole Blood", "Anion Gap", "Hematocrit", "pO2 Capillary", "Urobilinogen,   Urinalysis", "Asparagine Level", "MCV", "Bilirubin, Urinalysis", "Alanine Level", "Carnitine Free", "Urine Culture", "Nucleated Red Blood Cell %", "Prealbumin", "O2Sat Capillary", "Ornithine Level", "Absolute Monocyte Count", "Histidine Level", "BUN", "Threonine Level", "Color, Urinalysis", "Insulin Level", "Schistocytes, RBC", "pH, Urinalysis", "MCH", "Bilirubin, Direct", "pO2 Arterial", "Phosphorus", "Calcium", "Human Growth Hormone, Random", "Potassium, Whole Blood", "Macrocytosis, RBC", "Appearance, Urinalysis", "Glucose, Whole Blood", "Blood, Urinalysis", "Ketone Qualitative, Other Fluid", "Citrulline Level", "Carnitine Total", "Nucleated Red Blood Cell Count", "Absolute Neutrophil Count", "Bilirubin, Total", "Reticulocyte Cell Hemoglobin", "Reticulocyte, Absolute", "VRE Culture, Rectal", "Respiratory Culture and Gram Stain", "Red Cell Distribution Width CV", "Bicarb Venous", "Oxygen dissociation p50, Venous", "Eosinophil", "O2 Sat Venous", "MRSA Culture", "pCO2 Arterial"  Returns: table: A table of medical record lab results.</function_description>
-    <required_argument>type (str): The type of lab to be retrieved.</required_argument>
-    <returns>table: table: A table of medical record lab results.</returns>
-    <example_call>get_labs_by_type(type=value)</example_call>
-  </function>
-  <function>
-    <function_name>get_count_notes</function_name>
-    <function_description>Returns the total count of medical record notes for the current patient.</function_description>
-    <returns>int: int: The total count of medical record notes.</returns>
-    <example_call>get_count_notes()</example_call>
-  </function>
-  <function>
-    <function_name>get_count_labs</function_name>
-    <function_description>Returns the total count of lab records for the current patient.</function_description>
-    <returns>int: int: The total count of lab records.</returns>
-    <example_call>get_count_labs()</example_call>
-  </function>
-</functions>
+{XML_FUNCTION_DEFINITIONS}
 
 
 Note that the function arguments have been listed in the order that they should be passed into the function.
@@ -534,16 +542,15 @@ The question to answer is <question>{question}</question>
     return INITIAL_PROMPT
 
 
-
-
-
 app = Flask(__name__)
+
 
 @app.route('/conduct_chat', methods=['POST'])
 def conduct_chat_endpoint():
     initial_messages = request.json.get('initial_messages')
     last_message = initial_messages[-1]
     question = last_message['content']
+
     def conduct_chat():
         current_prompt = get_initial_prompt(question)
         print(current_prompt)
@@ -577,14 +584,17 @@ def conduct_chat_endpoint():
                 if "</function_call>" in buffer and not answering:
                     # Extract the function call
                     # print(buffer)
-                    function_call_match = re.search(r"<function_call>\s*(.*?)\s*</function_call>", buffer, re.DOTALL)
-                    function_call_content = function_call_match.group(1) if function_call_match else None
+                    function_call_match = re.search(
+                        r"<function_call>\s*(.*?)\s*</function_call>", buffer, re.DOTALL)
+                    function_call_content = function_call_match.group(
+                        1) if function_call_match else None
                     print(function_call_content)
 
                     yield '**⚙️ Calling function**\n\n'
 
                     result = eval(function_call_content)
-                    current_prompt = current_prompt + buffer + "<function_result>" + result + "</function_result>"
+                    current_prompt = current_prompt + buffer + \
+                        "<function_result>" + result + "</function_result>"
                     break
     headers = {
         'Content-Type': 'text/event-stream',
@@ -592,6 +602,7 @@ def conduct_chat_endpoint():
         'Connection': 'keep-alive',
     }
     return Response(conduct_chat(), headers=headers)
+
 
 if __name__ == '__main__':
     app.run(port=8000)
