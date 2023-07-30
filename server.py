@@ -306,6 +306,63 @@ def search_labs(search_str: "str") -> "table":
     return run_sql(f"SELECT * FROM lab_data WHERE lab ILIKE '%{search_str}%' OR source ILIKE '%{search_str}%' LIMIT 10")
 
 
+@doc_extractor
+def get_meds(start_index: "int", end_index: "int") -> "table":
+    """
+    Fetches med data for the current patient from `start_index` to `end_index`.
+
+    Arguments:
+    start_index (int): The starting index for the med data retrieval.
+    end_index (int): The ending index for the med data retrieval.
+
+    Raises:
+    ValueError: if the db has gone away.
+
+    Details:
+    - Table: med_data
+    - Columns: id, name, type, dose , start, end, unit
+    - Distinct med values (can change on an ad-hoc basis: "cefepime", "DOPamine", "FEN", "vancomycin", "furosemide", "D17.5W 500 mL[5074049391]", "D5W 1,000 mL + sodium ACETATE, IVF 77 mEq[5065323385]", "D10W 1,000 mL + sodium ACETATE, IVF 20 mEq[5063225641]", "silver sulfADIAZINE topical", "fentaNYL", "DERM", "D5W 1,000 mL + sodium ACETATE, IVF 154 mEq[5064867545]", "glycerin", "dexAMETHasone", "Parenteral Nutrition 74.4 mL[5062322395]", "MISC", "acetaminophen", "ENDO", "dexmedeTOMIDine", "caffeine", "fat emulsion 20%, intravenous 26.4 mL[5062322399]")
+    Returns:
+    table: A table of med record results.
+    """
+    return run_sql("SELECT * FROM med_data LIMIT 10")
+
+
+@doc_extractor
+def get_meds_by_type(type: "str") -> "table":
+    """
+    Fetches med data for the current patient filtered by the med type provided.
+
+    Arguments:
+    type (str): The type of med to be retrieved.
+
+    Raises:
+    ValueError: if the db has gone away.
+
+    Details:
+    - Table: med_data
+    - Columns: id, name, type, dose , start, end, unit
+    - Distinct med type values (can change on an ad-hoc basis: "cefepime", "DOPamine", "FEN", "vancomycin", "furosemide", "D17.5W 500 mL[5074049391]", "D5W 1,000 mL + sodium ACETATE, IVF 77 mEq[5065323385]", "D10W 1,000 mL + sodium ACETATE, IVF 20 mEq[5063225641]", "silver sulfADIAZINE topical", "fentaNYL", "DERM", "D5W 1,000 mL + sodium ACETATE, IVF 154 mEq[5064867545]", "glycerin", "dexAMETHasone", "Parenteral Nutrition 74.4 mL[5062322395]", "MISC", "acetaminophen", "ENDO", "dexmedeTOMIDine", "caffeine", "fat emulsion 20%, intravenous 26.4 mL[5062322399]")
+    Returns:
+    table: A table of med record results.
+    """
+    return run_sql(f"SELECT * FROM med_data WHERE type ILIKE '%{type}%' LIMIT 10")
+
+
+@doc_extractor
+def get_count_meds() -> "int":
+    """
+    Returns the total count of med records for the current patient.
+    Raises:
+
+    ValueError: if the db has gone away.
+
+    Returns:
+    int: The total count of med records.
+    """
+    return run_sql("SELECT COUNT(*) from med_data")
+
+
 XML_FUNCTION_DEFINITIONS = dict_to_pretty_xml(functions)
 
 
