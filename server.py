@@ -182,7 +182,7 @@ def get_notes_by_type(type: "str") -> "table":
     Returns:
     table: A table of medical record notes.
     """
-    return run_sql("SELECT * FROM notes_data WHERE NOTE_TYPE = '{type}' LIMIT 5")
+    return run_sql("SELECT * FROM notes_data WHERE note_type ILIKE '%{type}%'")
 
 
 @doc_extractor
@@ -227,7 +227,7 @@ def get_labs_by_type(type: "str") -> "table":
     Returns:
     table: A table of medical record lab results.
     """
-    return run_sql(f"SELECT * FROM lab_data WHERE lab_type={type}")
+    return run_sql(f"SELECT * FROM lab_data WHERE lab ILIKE '%{type}%'")
 
 
 @doc_extractor
@@ -259,9 +259,9 @@ def get_count_labs() -> "int":
 def get_initial_prompt(question):
     TODAYS_DATE_STRING = "2023-06-08 12:35:02"
 
-    INITIAL_PROMPT = f"""{HUMAN_PROMPT} 
-    You are a medical research assistant AI that has been equipped with the following function(s) to help you answer a <question>. 
-    Your goal is to answer the user's question to the best of your ability, using the function(s) to gather more information if necessary 
+    INITIAL_PROMPT = f"""{HUMAN_PROMPT}
+    You are a medical research assistant AI that has been equipped with the following function(s) to help you answer a <question>.
+    Your goal is to answer the user's question to the best of your ability, using the function(s) to gather more information if necessary
     to better answer the question. The result of a function call will be added to the conversation history as an observation.
 
     Here are the only function(s) I have provided you with:
@@ -316,7 +316,7 @@ def get_initial_prompt(question):
 
 Note that the function arguments have been listed in the order that they should be passed into the function.
 
-Do not modify or extend the provided functions under any circumstances. For example, calling get_current_temp() with additional parameters would be considered modifying the function which is not allowed. Please use the functions only as defined. 
+Do not modify or extend the provided functions under any circumstances. For example, calling get_current_temp() with additional parameters would be considered modifying the function which is not allowed. Please use the functions only as defined.
 
 DO NOT use any functions that I have not equipped you with.
 
@@ -347,7 +347,7 @@ When querying by date, always use today's date and don't use database date funct
 
 <question>What labs has the patient done in the past??</question>
 
-<scratchpad>I do not have access to the lab history of the patient so I should use a function to gather more information to answer this question. 
+<scratchpad>I do not have access to the lab history of the patient so I should use a function to gather more information to answer this question.
 
 I have been equipped with the function run_sql that runs sql on our database so I should use that to gather more information.
 
@@ -357,7 +357,7 @@ Columns: id, date, source, lab, value, units, normal_low, normal_high, critical_
 I have double checked and made sure that I have been provided the run_sql function.
 </scratchpad>
 
-<function_call>run_sql(query=''' 
+<function_call>run_sql(query='''
 SELECT
     lab,
     COUNT(*) AS lab_count,
@@ -412,7 +412,7 @@ Here is another example that utilizes multiple function calls:
 
 <scratchpad>
 To answer this question, I will need to:
-1. Get the ticker symbol for General Motors using the get_ticker_symbol() function. 
+1. Get the ticker symbol for General Motors using the get_ticker_symbol() function.
 2. Use the returned ticker symbol to get the current stock price using the get_current_stock_price() function.
 
 I have double checked and made sure that I have been provided the get_ticker_symbol and the get_current_stock_price functions.
@@ -456,7 +456,7 @@ Here is an example that shows what to do in the case of an error:
 
 <scratchpad>
 To answer this question, I will need to:
-1. Get the ticker symbol for The General Motors Company LLC using the get_ticker_symbol() function. 
+1. Get the ticker symbol for The General Motors Company LLC using the get_ticker_symbol() function.
 2. Use the returned ticker symbol to get the current stock price using the get_current_stock_price() function.
 
 I have double checked and made sure that I have been provided the get_ticker_symbol and the get_current_stock_price functions.
@@ -466,7 +466,7 @@ I have double checked and made sure that I have been provided the get_ticker_sym
 
 <error>TickerNotFound: If no matching ticker symbol is found.</error>
 
-<scratchpad>The get_ticker_symbol(company_name=\"The General Motors Company LLC\") call raised a TickerNotFound: If no matching ticker symbol is found error indicating that the provided str did not return a matching ticker symbol. I should retry the function using another name variation of the company.</scratchpad> 
+<scratchpad>The get_ticker_symbol(company_name=\"The General Motors Company LLC\") call raised a TickerNotFound: If no matching ticker symbol is found error indicating that the provided str did not return a matching ticker symbol. I should retry the function using another name variation of the company.</scratchpad>
 
 <function_call>get_ticker_symbol(company_name=\"General Motors\")</function_call>
 
@@ -519,16 +519,16 @@ Unfortunately, I don't know the current exchange rate from USD to Euro.
 
 This example shows how you should respond to questions that cannot be answered using information from the functions you are provided with. Remember, DO NOT use any functions that I have not provided you with.
 
-Remember, your goal is to answer the user's question to the best of your ability, using only the function(s) provided to gather more information if necessary to better answer the question. 
+Remember, your goal is to answer the user's question to the best of your ability, using only the function(s) provided to gather more information if necessary to better answer the question.
 
-Do not modify or extend the provided functions under any circumstances. For example, calling get_current_temp() with additional parameters would be modifying the function which is not allowed. Please use the functions only as defined. 
+Do not modify or extend the provided functions under any circumstances. For example, calling get_current_temp() with additional parameters would be modifying the function which is not allowed. Please use the functions only as defined.
 
 The result of a function call will be added to the conversation history as an observation. Never make up the function result, just open the tag and let the Human insert the resul. If necessary, you can make multiple function calls and use all the functions I have equipped you with. Let's create a plan and then execute the plan. Double check your plan to make sure you don't call any functions that I haven't provided. Always return your final answer within  <answer></answer> tags and use markdown format.
 
 
 The question to answer is <question>{question}</question>
-    
-    
+
+
     {AI_PROMPT}<scratchpad> I understand I cannot use functions that have not been provided to me to answer this question.
     """
     return INITIAL_PROMPT
@@ -582,7 +582,7 @@ def conduct_chat_endpoint():
                     print(function_call_content)
 
                     yield '**⚙️ Calling function**\n\n'
-        
+
                     result = eval(function_call_content)
                     current_prompt = current_prompt + buffer + "<function_result>" + result + "</function_result>"
                     break
