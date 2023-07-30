@@ -4,14 +4,16 @@ import psycopg2
 import os
 from tabulate import tabulate
 import functools
-import time
 import re
 from anthropic2.dict_to_pretty_xml import dict_to_pretty_xml
 from twilio.rest import Client
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 anthropic = Anthropic(
-    api_key=***REMOVED***)
+    api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 # from dict_to_pretty_xml import dict_to_pretty_xml
 

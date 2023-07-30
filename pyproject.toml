@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "anthropic-function-calling"
+name = "health-halo-backend"
 version = "0.1.0"
 description = ""
 authors = ["Aditya Advani <aditya@bestparents.com>"]
 readme = "README.md"
-packages = [{include = "anthropic_function_calling"}]
+packages = [{include = "health_halo_backend"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
