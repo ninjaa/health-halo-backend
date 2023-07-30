@@ -4,7 +4,7 @@ from pprint import pprint
 import os
 import psycopg2
 from dotenv import load_dotenv
-from anthropic.dict_to_pretty_xml import dict_to_pretty_xml
+from dict_to_pretty_xml import dict_to_pretty_xml
 import re
 
 load_dotenv()
