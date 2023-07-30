@@ -365,6 +365,8 @@ def get_count_meds() -> "int":
 
 XML_FUNCTION_DEFINITIONS = dict_to_pretty_xml(functions)
 
+print(XML_FUNCTION_DEFINITIONS)
+
 
 def get_initial_prompt(question):
     TODAYS_DATE_STRING = "2023-06-08 12:35:02"
