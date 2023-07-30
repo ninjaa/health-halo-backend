@@ -1,4 +1,4 @@
-from flask import Flask, stream_with_context, request, Response
+from flask import Flask, stream_with_context, request, Response, make_response
 import time
 import re
 
@@ -260,9 +260,9 @@ def get_initial_prompt(question):
     TODAYS_DATE_STRING = "2023-06-08 12:35:02"
 
     INITIAL_PROMPT = f"""{HUMAN_PROMPT} 
-    You are a medical research assistant AI that has been equipped with the following function(s) to help you answer a <question>. 
+    You are the world's most advanced medical research assistant AI that has been equipped with the following function(s) to help you answer a <question>. 
     Your goal is to answer the user's question to the best of your ability, using the function(s) to gather more information if necessary 
-    to better answer the question. The result of a function call will be added to the conversation history as an observation.
+    to better answer the question. The result of a function call will be added to the conversation history as an observation. if you are unsure of where to find information, check patient notes.
 
     Here are the only function(s) I have provided you with:
 
@@ -274,7 +274,7 @@ def get_initial_prompt(question):
     <function_description>Fetches medical record notes for the current patient from `start_index` to `end_index`.</function_description>
     <required_argument>start_index (int): The starting index for the notes retrieval.</required_argument>
     <required_argument>end_index (int): The ending index for the notes retrieval.</required_argument>
-    <returns>table: table: A table of medical record notes.</returns>
+    <returns>table: table: A table of medical record notes. remember to always cite the source URL if you use information from the notes.</returns>
     <example_call>get_notes(start_index=value, end_index=value)</example_call>
   </function>
   <function>
@@ -523,13 +523,12 @@ Remember, your goal is to answer the user's question to the best of your ability
 
 Do not modify or extend the provided functions under any circumstances. For example, calling get_current_temp() with additional parameters would be modifying the function which is not allowed. Please use the functions only as defined. 
 
-The result of a function call will be added to the conversation history as an observation. Never make up the function result, just open the tag and let the Human insert the resul. If necessary, you can make multiple function calls and use all the functions I have equipped you with. Let's create a plan and then execute the plan. Double check your plan to make sure you don't call any functions that I haven't provided. Always return your final answer within  <answer></answer> tags and use markdown format.
-
+The result of a function call will be added to the conversation history as an observation. Never make up the function result, just open the tag and let the Human insert the resul. If necessary, you can make multiple function calls and use all the functions I have equipped you with. Let's create a plan and then execute the plan. Double check your plan to make sure you don't call any functions that I haven't provided. Always return your final answer within  <answer></answer> tags and use markdown format. IMPORTANT: if you reference information from the patient notes, always include the source of each note in the answer in markdown format. eg [source](https://www.google.com)
 
 The question to answer is <question>{question}</question>
     
     
-    {AI_PROMPT}<scratchpad> I understand I cannot use functions that have not been provided to me to answer this question.
+    {AI_PROMPT}<scratchpad> I understand I cannot use functions that have not been provided to me to answer this question. I will ALWAYS remember to cite my sources if I reference information from patient notes.
     """
     return INITIAL_PROMPT
 
@@ -538,6 +537,40 @@ The question to answer is <question>{question}</question>
 
 
 app = Flask(__name__)
+@app.route('/notes/<int:note_id>', methods=['GET'])
+def get_note(note_id):
+    # Connect to your database
+    database = os.getenv("DB_NAME")
+    user = os.getenv("DB_USER")
+    password = os.getenv("DB_PASSWORD")
+    host = os.getenv("DB_HOST")
+    port = os.getenv("DB_PORT")
+
+    connection = None
+    try:
+        connection = psycopg2.connect(
+            database=database, user=user, password=password, host=host, port=port)
+        cursor = connection.cursor()
+
+        # Execute the SQL query
+        query = f"SELECT note_content FROM notes_data WHERE id = {note_id};"
+        cursor.execute(query)
+
+        # Fetch all rows
+        rows = cursor.fetchall()
+
+        # Close the cursor and connection
+        cursor.close()
+        connection.close()
+        if rows:
+                note_content = rows[0][0]
+                resp = make_response(f'<html><body><h1 style="font-size: 2em;">{note_content}</h1></body></html>')
+                resp.headers["Content-type"] = "text/html"
+                return resp
+        # return only the content of the note, which is assumed to be in the first column of the first row
+        return rows[0][0] if rows else Response("Note not found", status=404)
+    except Exception as e:
+        return str(e)
 
 @app.route('/conduct_chat', methods=['POST'])
 def conduct_chat_endpoint():
@@ -566,6 +599,7 @@ def conduct_chat_endpoint():
                     if "</" in chunk:
                         # remove closing answer tag from chunk
                         chunk = chunk[:chunk.find("</")]
+                        chunk = chunk + "\n"
                         yield chunk
                         return
                     yield chunk
